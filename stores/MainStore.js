@@ -53,40 +53,14 @@ class MainStore {
                     console.log('connect')
                 })
                 socket.on('disconnect', () => {})
-                socket.on('main:new_message', (data) => {
-                    this.addMessage(data)
-                    if(data.payload?.users){
-                        this.setOnline(data.payload.users)
-                    }
-                })
+
                 socket.on('main:login', (data) => {
                     this.setLogin(data.login)
                 })
                 socket.on('pm:login', (data) => {
                     this.setLogin(data.login)
                 })
-                socket.on('pm:new_message', (data) => {
-                    // TODO: доделать
-                    if(this.cryptoMessanger && data.encrypted){
-                        if(this.cryptoMessanger.getKey()){
-                            data.text = this.cryptoMessanger.decrypt(data.text)
-                        }
-                    }
-                    this.addMessage(data)
-                    if(data.payload?.users){
-                        this.setOnline(data.payload.users)
-                    }
-                    if(data.payload?.mate){
-                        this.setMate(data.payload.mate)
-                    } 
-                    if(data.payload?.role){
-                        this.setRole(data.payload.role)
-                    } 
-                    if(data.payload?.mateLeft){
-                        this.setMate(null)
-                        this.setCryptoMessanger(null)
-                    }
-                })
+
                 socket.on('pm:alice_send_key', (data) => {
                     if(this.role == 'bob'){
                         if(!this.cryptoMessanger){

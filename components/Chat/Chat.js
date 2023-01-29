@@ -1,6 +1,7 @@
 import { observer, inject } from 'mobx-react';
 import MessagesArea from './MessagesArea';
 import ChatStatus from './ChatStatus';
+import {useEffect, useRef} from 'react'
 
 const LockIcon = ({style}) => {
     return <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-shield-lock-fill" viewBox="0 0 16 16" {...style}>
@@ -9,6 +10,8 @@ const LockIcon = ({style}) => {
 }
 
 export default inject('store')(observer(function Chat({ store, pid }){
+
+    const bottomRef = useRef()
     
     const onSendMessage = function (e) {
         e.preventDefault()
@@ -18,6 +21,41 @@ export default inject('store')(observer(function Chat({ store, pid }){
             e.target[0].value = ''
         }
     }
+    useEffect(() => {
+        if(store.socket){
+            store.socket.on('pm:new_message', (data) => {
+
+                if(store.cryptoMessanger && data.encrypted){
+                    if(store.cryptoMessanger.getKey()){
+                        data.text = store.cryptoMessanger.decrypt(data.text)
+                    }
+                }
+                store.addMessage(data)
+                if(data.payload?.users){
+                    store.setOnline(data.payload.users)
+                }
+                if(data.payload?.mate){
+                    store.setMate(data.payload.mate)
+                }
+                if(data.payload?.role){
+                    store.setRole(data.payload.role)
+                }
+                if(data.payload?.mateLeft){
+                    store.setMate(null)
+                    store.setCryptoMessanger(null)
+                }
+
+               setTimeout(() => bottomRef.current?.scrollIntoView({behavior: 'smooth'}), 50)
+            })
+            store.socket.on('main:new_message', (data) => {
+                store.addMessage(data)
+                if(data.payload?.users){
+                    store.setOnline(data.payload.users)
+                }
+                setTimeout(() => bottomRef.current?.scrollIntoView({behavior: 'smooth'}), 50)
+            })
+        }
+    }, [store.socket])
 
     const isPrivateMessage = pid ? true : false
     const isMateConnected = store.mate
@@ -32,6 +70,7 @@ export default inject('store')(observer(function Chat({ store, pid }){
                 {isPrivateMessage && <ChatStatus isShow={!isMateConnected}/>}
                 <div className="chat-messages__container">
                     <MessagesArea/>
+                    <div ref={bottomRef}></div>
                 </div>
             </div>
             <div className="chat__input chat-input">
