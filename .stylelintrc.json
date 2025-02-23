@@ -1,15 +1,10 @@
 {
-  "extends": ["stylelint-config-standard", "stylelint-config-recommended-scss"],
+  "extends": ["stylelint-config-standard", "stylelint-config-recommended-scss", "prettier"],
   "plugins": ["stylelint-order"],
   "rules": {
     "at-rule-no-unknown": null,
     "scss/operator-no-unspaced": null,
-    "scss/at-rule-no-unknown": [
-      true,
-      {
-        "ignoreAtRules": ["tailwind"]
-      }
-    ],
+    "scss/at-rule-no-unknown": [true],
     "import-notation": null,
     "font-family-name-quotes": "always-unless-keyword",
     "font-weight-notation": "numeric",

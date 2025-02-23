@@ -1,25 +1,12 @@
-import { inject, observer } from 'mobx-react';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import Chat from '../../components/Chat/Chat';
+'use client';
+import Chat from '@/shared/ui/Chat';
+import { useParams } from 'next/navigation';
 
 function PrivateMessage() {
-  const router = useRouter();
-  const { pid } = router.query;
+  const { pid } = useParams() as { pid: string };
 
-  useEffect(() => {
-    store.createConnection('pm', { chatId: window.location.pathname.split('/')[2] });
-    return () => {};
-  }, []);
   return (
     <>
-      <Head>
-        <title>CryptoChat</title>
-        <meta name='description' content='Pet-project. Live chat with end-to-end encryption' />
-        <meta name='viewport' content='width=device-width, initial-scale=1' />
-        <link rel='icon' href='/favicon.ico' />
-      </Head>
       <main className='main'>
         <div className='content'>
           <div className='content__wrapper'>
@@ -33,4 +20,4 @@ function PrivateMessage() {
   );
 }
 
-export default inject('store')(observer(PrivateMessage));
+export default PrivateMessage;

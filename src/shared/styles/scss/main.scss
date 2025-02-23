@@ -1,30 +1,25 @@
 @use "sass:color";
 
-@import "tailwindcss";
+@import "~normalize.css";
 @import "variables";
 @import "responsive";
 @import "fonts";
-@import "~bootstrap/scss/bootstrap";
 @import "chat";
 
 body {
-  height: 100vh;
   font-family: "Ubuntu", sans-serif;
   color: $text-color;
   background-color: $bg-color;
 }
 
-#__next,
-.main {
-  height: 100%;
-}
-
-.main {
+main {
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   width: 100%;
   height: 100%;
+  min-height: 100vh;
 
   @include respondto(xs, sm) {
     align-items: unset;
@@ -42,6 +37,7 @@ body {
 
   &__wrapper {
     display: flex;
+    row-gap: 40px;
     align-items: center;
 
     @include respondto(xs, sm) {
@@ -80,9 +76,17 @@ body {
 }
 
 .btn {
+  display: block;
+  outline: none;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 16px;
   width: fit-content;
   font-size: 18px;
+  text-decoration: none;
   color: black;
+  cursor: pointer;
+  transition: 0.15s ease-in-out;
 
   &--gray {
     color: $text-color;
@@ -90,7 +94,8 @@ body {
 
     &:hover {
       color: $text-color;
-      background-color: color.adjust($gray-1, 15%);
+      background: #cacaca30;
+      transition: 0.15s ease-in-out;
     }
   }
 

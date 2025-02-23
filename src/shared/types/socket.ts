@@ -1,6 +1,6 @@
 export type MessageType = 'notification' | 'message';
 
-export type Message = {
+export type ServerMessage = {
   type: MessageType;
   text: string;
   username: string;
@@ -9,18 +9,29 @@ export type Message = {
   payload: Record<string, string>;
 };
 
+export interface ClientMessage {
+  text: string;
+  encrypted?: boolean;
+  payload?: {
+    users?: number;
+    mate?: boolean;
+    role?: string;
+    mateLeft?: boolean;
+  };
+}
+
 // pm chat
 export interface PrivateChatClientToServerEvents {
-  aliceSentKey: (data: Message) => void;
-  bobSentKey: (data: Message) => void;
-  newMessage: (message: Message) => void;
+  aliceSentKey: (data: ClientMessage) => void;
+  bobSentKey: (data: ClientMessage) => void;
+  newMessage: (message: ClientMessage) => void;
 }
 
 export interface PrivateChatServerToClientEvents {
   login: ({ username }: { username: string }) => void;
-  newMessage: (message: Message) => void;
-  aliceSentKey: (data: Message) => void;
-  bobSentKey: (data: Message) => void;
+  'pm:newMessage': (message: ServerMessage) => void;
+  aliceSentKey: (data: ServerMessage) => void;
+  bobSentKey: (data: ServerMessage) => void;
 }
 
 export type PrivateChatInterServerEvents = any;
@@ -32,11 +43,11 @@ export interface PrivateChatSocketData {
 
 // main chat
 export interface PublicChatClientToServerEvents {
-  newMessage: (message: Message) => void;
+  newMessage: (message: ClientMessage) => void;
 }
 
 export interface PublicChatServerToClientEvents {
-  newMessage: (message: Message) => void;
+  'main:newMessage': (message: ServerMessage) => void;
   login: ({ username }: { username: string }) => void;
 }
 export type PublicChatInterServerEvents = any;

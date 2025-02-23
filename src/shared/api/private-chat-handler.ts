@@ -1,9 +1,22 @@
+import {
+  PrivateChatClientToServerEvents,
+  PrivateChatInterServerEvents,
+  PrivateChatServerToClientEvents,
+  PrivateChatSocketData,
+} from '@/shared/types/socket';
 import { Socket } from 'socket.io';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 import generateSocketMessage from '../libs/generateSocketMessage';
 
+const debug = require('debug')('app:privateChatHandler');
+
 export default function privateChatHandler(
-  socket: Socket<PMClientToServerEvents, PMServerToClientEvents, PMInterServerEvents, PMSocketData>
+  socket: Socket<
+    PrivateChatClientToServerEvents,
+    PrivateChatServerToClientEvents,
+    PrivateChatInterServerEvents,
+    PrivateChatSocketData
+  >
 ) {
   const chatId = socket.handshake.query.chatId as string;
   const username = uniqueNamesGenerator({
@@ -17,25 +30,27 @@ export default function privateChatHandler(
   if (chatId) {
     const chat = socket.nsp.adapter.rooms.get(chatId);
     if (chat) {
-      if (chat.size < 2) {
+      if (chat.size === 1) {
+        debug('Bob connecting');
         socket.join(chatId);
         socket.broadcast.to(chatId).emit(
-          'newMessage',
+          'pm:newMessage',
           generateSocketMessage(socket.data.username, 'notification', `${username} вошел в чат`, {
             mate: true,
           })
         );
         socket.emit(
-          'newMessage',
+          'pm:newMessage',
           generateSocketMessage(socket.data.username, 'notification', `${username} вошел в чат`, {
             mate: true,
             role: 'bob',
           })
         );
-        socket.nsp
+        debug('Ready to chat');
+        return socket.nsp
           .to(chatId)
           .emit(
-            'newMessage',
+            'pm:newMessage',
             generateSocketMessage(
               socket.data.username,
               'notification',
@@ -43,21 +58,23 @@ export default function privateChatHandler(
             )
           );
       } else {
+        debug('Already 2 users in chat');
         socket.emit(
-          'newMessage',
+          'pm:newMessage',
           generateSocketMessage(
             socket.data.username,
             'notification',
             'В этой комнате уже общаются два человека',
-            { mate: 1 }
+            { mate: true }
           )
         );
         socket.disconnect();
       }
     } else {
+      debug('Alice connecting');
       socket.join(chatId);
       socket.nsp.to(chatId).emit(
-        'newMessage',
+        'pm:newMessage',
         generateSocketMessage(socket.data.username, 'notification', `${username} вошел в чат`, {
           mate: false,
           role: 'alice',
@@ -65,15 +82,24 @@ export default function privateChatHandler(
       );
     }
   } else {
+    debug('Bad chatId');
     socket.disconnect();
   }
 
   socket.on('aliceSentKey', (data) => {
-    socket.broadcast.to(chatId).emit('aliceSentKey', data);
+    debug('aliceSentKey');
+    socket.broadcast.to(chatId).emit('aliceSentKey', {
+      ...data,
+      payload: {},
+      encrypted: false,
+      username: socket.data.username,
+      type: 'notification',
+      date: new Date(),
+    });
     socket.broadcast
       .to(chatId)
       .emit(
-        'newMessage',
+        'pm:newMessage',
         generateSocketMessage(
           socket.data.username,
           'notification',
@@ -84,11 +110,19 @@ export default function privateChatHandler(
   });
 
   socket.on('bobSentKey', (data) => {
-    socket.broadcast.to(chatId).emit('bobSentKey', data);
+    debug('bobSentKey');
+    socket.broadcast.to(chatId).emit('bobSentKey', {
+      ...data,
+      payload: {},
+      encrypted: false,
+      username: socket.data.username,
+      type: 'notification',
+      date: new Date(),
+    });
     socket.broadcast
       .to(chatId)
       .emit(
-        'newMessage',
+        'pm:newMessage',
         generateSocketMessage(
           socket.data.username,
           'notification',
@@ -99,25 +133,22 @@ export default function privateChatHandler(
   });
 
   socket.on('newMessage', (data) => {
+    debug('newMessage');
     socket.nsp
       .to(chatId)
       .emit(
-        'newMessage',
+        'pm:newMessage',
         generateSocketMessage(socket.data.username, 'message', data.text, {}, socket.data.encrypted)
       );
   });
 
   socket.on('disconnect', async () => {
-    socket.nsp
-      .to(chatId)
-      .emit(
-        'newMessage',
-        generateSocketMessage(
-          socket.data.username,
-          'notification',
-          `${username} покинул чат`,
-          ChatEvents.MATE_LEFT
-        )
-      );
+    debug('disconnect');
+    socket.nsp.to(chatId).emit(
+      'pm:newMessage',
+      generateSocketMessage(socket.data.username, 'notification', `${username} покинул чат`, {
+        mateLeft: true,
+      })
+    );
   });
 }

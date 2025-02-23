@@ -1,13 +1,13 @@
-import ClockLoader from 'react-spinners/ClockLoader';
+import { ClockLoader } from 'react-spinners';
 
 export default function ChatStatus() {
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.href);
   };
   return (
-    <div className='chat-messages__status messages-status' style={props}>
+    <div className='chat-messages__status messages-status'>
       <div className='messages-status__wrapper'>
-        <div>
+        <div className='messages-status__invite'>
           Пригласите человека с помощью ссылки
           <button className='btn btn--gray btn--sm mx-1' onClick={copyLink}>
             Скопировать

@@ -1,10 +1,12 @@
+import { MessageType, ServerMessage } from '@/shared/types/socket';
+
 export default function generateSocketMessage(
   username: string,
   type: MessageType,
   text: string,
   payload = {},
   encrypted = false
-): Message {
+): ServerMessage {
   return {
     type,
     text,
