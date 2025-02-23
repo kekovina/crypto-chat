@@ -1,25 +1,29 @@
 @font-face {
-    font-family: 'AmaticSC';
-    src: url("/fonts/AmaticSC-Regular.woff2") format("woff2");
-    font-weight: normal;
-  }
-  @font-face {
-    font-family: 'AmaticSC';
-    src: url("/fonts/AmaticSC-Bold.woff2") format("woff2");
-    font-weight: bold;
-  }
-  @font-face {
-    font-family: 'Ubuntu';
-    src: url("/fonts/Ubuntu-Medium.woff2") format("woff2");
-    font-weight: medium;
-  }
-  @font-face {
-    font-family: 'Ubuntu';
-    src: url("/fonts/Ubuntu-Regular.woff2") format("woff2");
-    font-weight: normal;
-  }
-  @font-face {
-    font-family: 'Ubuntu';
-    src: url("/fonts/Ubuntu-Italic.woff2") format("woff2");
-    font-style: italic;
-  }
+  src: url("/fonts/AmaticSC-Regular.woff2") format("woff2");
+  font-family: "AmaticSC";
+  font-weight: 400;
+}
+
+@font-face {
+  src: url("/fonts/AmaticSC-Bold.woff2") format("woff2");
+  font-family: "AmaticSC";
+  font-weight: 700;
+}
+
+@font-face {
+  src: url("/fonts/Ubuntu-Medium.woff2") format("woff2");
+  font-family: "Ubuntu";
+  font-weight: 600;
+}
+
+@font-face {
+  src: url("/fonts/Ubuntu-Regular.woff2") format("woff2");
+  font-family: "Ubuntu";
+  font-weight: 400;
+}
+
+@font-face {
+  src: url("/fonts/Ubuntu-Italic.woff2") format("woff2");
+  font-family: "Ubuntu";
+  font-style: italic;
+}
