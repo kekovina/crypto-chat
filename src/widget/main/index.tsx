@@ -1,16 +1,13 @@
 import { useEffect } from 'react';
+import Link from 'next/link'
 import Head from 'next/head'
-import Chat from '../../components/Chat/Chat'
+import Chat from '../components/Chat/Chat'
 import { observer, inject } from 'mobx-react';
-import { useRouter } from 'next/router'
 
 
-function PrivateMessage({ store, params }) {
-  const router = useRouter()
-  const { pid } = router.query
-  
+function Home({ store }) {
   useEffect(() => {
-    store.createConnection('pm', {chatId: window.location.pathname.split('/')[2]})
+    store.createConnection('chat')
     return () => {
     };
   }, []);
@@ -25,8 +22,15 @@ function PrivateMessage({ store, params }) {
       <main className='main'>
         <div className="content">
           <div className="content__wrapper">
+            <div className="d-flex flex-column justify-content-center my-3 my-lg-0 content__description description">
+              <h1 className="description__title">CryptoChat</h1>
+              <p className="description__text">Чатик со сквозным шифрованием</p>
+              <Link href="/api/createRoom" className="btn btn--gray btn--center">
+                Создать диалог
+              </Link>
+            </div>
             <div className="content__chat">
-              <Chat pid={pid}/>
+              <Chat/>
             </div>
           </div>
         </div>
@@ -35,4 +39,4 @@ function PrivateMessage({ store, params }) {
   )
 }
 
-export default inject('store')(observer(PrivateMessage))
+export default inject('store')(observer(Home))
