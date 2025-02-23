@@ -1,14 +1,14 @@
-import { NextConfig } from "next";
 import Joi from 'joi';
-import path from 'node:path'
+import { NextConfig } from 'next';
 import { writeFileSync } from 'node:fs';
+import path from 'node:path';
 
 const configuration = {
-  NEXT_PUBLIC_DOMAIN: process.env.DOMAIN
+  NEXT_PUBLIC_DOMAIN: process.env.DOMAIN,
 };
 
 const configurationValidation = Joi.object({
-  DOMAIN: Joi.string().description('домен приложения').default("localhost")
+  DOMAIN: Joi.string().description('домен приложения').default('localhost'),
 });
 
 const sampleEnvDocumentation = () => {
@@ -29,10 +29,7 @@ const sampleEnvDocumentation = () => {
 
     output += `${finalDescription}${key}=${value}\n`;
   });
-  writeFileSync(
-    path.join(process.cwd(), '.env.example'),
-    output,
-  );
+  writeFileSync(path.join(process.cwd(), '.env.example'), output);
 };
 sampleEnvDocumentation();
 
@@ -57,15 +54,15 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/api/:path*",
+        source: '/api/:path*',
         headers: [
-          { key: "Access-Control-Allow-Credentials", value: "true" },
-          { key: "Access-Control-Allow-Origin", value: `https://${process.env.DOMAIN}` },
-          { key: "Access-Control-Allow-Methods", value: "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Access-Control-Allow-Origin', value: `https://${process.env.DOMAIN}` },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,OPTIONS,PATCH,DELETE,POST,PUT' },
           {
-            key: "Access-Control-Allow-Headers",
+            key: 'Access-Control-Allow-Headers',
             value:
-              "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
+              'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
           },
         ],
       },
@@ -73,4 +70,3 @@ const nextConfig: NextConfig = {
   },
 };
 export default nextConfig;
-
