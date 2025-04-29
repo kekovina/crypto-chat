@@ -1,4 +1,8 @@
-export type MessageType = 'notification' | 'message';
+export enum MessageType {
+  NOTIFICATION = 'notification',
+  MESSAGE = 'message',
+  PUBLIC_KEY = 'public-key'
+};
 
 export type Message = {
   type: MessageType;
@@ -11,16 +15,15 @@ export type Message = {
 
 // pm chat
 export interface PrivateChatClientToServerEvents {
-  aliceSentKey: (data: Message) => void;
-  bobSentKey: (data: Message) => void;
-  newMessage: (message: Message) => void;
+  'send-public-key': (message: Message) => void;
+  'encrypted-message': (message: Message) => void
 }
 
 export interface PrivateChatServerToClientEvents {
   login: ({ username }: { username: string }) => void;
   newMessage: (message: Message) => void;
-  aliceSentKey: (data: Message) => void;
-  bobSentKey: (data: Message) => void;
+  'receive-public-key': (message: Message) => void
+  'encrypted-message': (message: Message) => void
 }
 
 export type PrivateChatInterServerEvents = any;
@@ -42,4 +45,8 @@ export interface PublicChatServerToClientEvents {
 export type PublicChatInterServerEvents = any;
 export interface PublicChatSocketData {
   username: string;
+}
+
+export enum ChatEvents {
+  MATE_LEFT = 'mate_left'
 }

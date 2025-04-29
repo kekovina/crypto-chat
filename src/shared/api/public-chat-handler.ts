@@ -1,13 +1,14 @@
 import { Socket } from 'socket.io';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 import generateSocketMessage from '../libs/generateSocketMessage';
+import { MessageType, PublicChatClientToServerEvents, PublicChatInterServerEvents, PublicChatServerToClientEvents, PublicChatSocketData } from '../types/socket';
 
 export default async function publicChatHandler(
   socket: Socket<
-    ChatClientToServerEvents,
-    ChatServerToClientEvents,
-    ChatInterServerEvents,
-    ChatSocketData
+    PublicChatClientToServerEvents,
+    PublicChatServerToClientEvents,
+    PublicChatInterServerEvents,
+    PublicChatSocketData
   >
 ) {
   const users = await socket.nsp.fetchSockets();
@@ -20,7 +21,7 @@ export default async function publicChatHandler(
   socket.emit('login', { username });
   socket.nsp.emit(
     'newMessage',
-    generateSocketMessage(username, 'notification', `${username} вошел в чат`, {
+    generateSocketMessage(username, MessageType.NOTIFICATION, `${username} вошел в чат`, {
       users: users.length,
     })
   );
@@ -28,7 +29,7 @@ export default async function publicChatHandler(
   socket.on('newMessage', async (data) => {
     socket.nsp.emit(
       'newMessage',
-      generateSocketMessage(socket.data.username, 'message', data.text)
+      generateSocketMessage(socket.data.username, MessageType.MESSAGE, data.text)
     );
   });
 
@@ -38,7 +39,7 @@ export default async function publicChatHandler(
       'newMessage',
       generateSocketMessage(
         socket.data.username,
-        'notification',
+        MessageType.NOTIFICATION,
         `${socket.data.username} покинул чат`,
         {
           users: users.length,

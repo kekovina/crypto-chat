@@ -1,9 +1,10 @@
 import { Socket } from 'socket.io';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 import generateSocketMessage from '../libs/generateSocketMessage';
+import { ChatEvents, MessageType, PrivateChatClientToServerEvents, PrivateChatInterServerEvents, PrivateChatServerToClientEvents, PrivateChatSocketData } from '../types/socket';
 
 export default function privateChatHandler(
-  socket: Socket<PMClientToServerEvents, PMServerToClientEvents, PMInterServerEvents, PMSocketData>
+  socket: Socket<PrivateChatClientToServerEvents, PrivateChatServerToClientEvents, PrivateChatInterServerEvents, PrivateChatSocketData>
 ) {
   const chatId = socket.handshake.query.chatId as string;
   const username = uniqueNamesGenerator({
@@ -21,13 +22,13 @@ export default function privateChatHandler(
         socket.join(chatId);
         socket.broadcast.to(chatId).emit(
           'newMessage',
-          generateSocketMessage(socket.data.username, 'notification', `${username} вошел в чат`, {
+          generateSocketMessage(socket.data.username, MessageType.NOTIFICATION, `${username} вошел в чат`, {
             mate: true,
           })
         );
         socket.emit(
           'newMessage',
-          generateSocketMessage(socket.data.username, 'notification', `${username} вошел в чат`, {
+          generateSocketMessage(socket.data.username, MessageType.NOTIFICATION, `${username} вошел в чат`, {
             mate: true,
             role: 'bob',
           })
@@ -38,7 +39,7 @@ export default function privateChatHandler(
             'newMessage',
             generateSocketMessage(
               socket.data.username,
-              'notification',
+              MessageType.NOTIFICATION,
               'Создаём безопасное соединение...'
             )
           );
@@ -47,7 +48,7 @@ export default function privateChatHandler(
           'newMessage',
           generateSocketMessage(
             socket.data.username,
-            'notification',
+            MessageType.NOTIFICATION,
             'В этой комнате уже общаются два человека',
             { mate: 1 }
           )
@@ -58,7 +59,7 @@ export default function privateChatHandler(
       socket.join(chatId);
       socket.nsp.to(chatId).emit(
         'newMessage',
-        generateSocketMessage(socket.data.username, 'notification', `${username} вошел в чат`, {
+        generateSocketMessage(socket.data.username, MessageType.NOTIFICATION, `${username} вошел в чат`, {
           mate: false,
           role: 'alice',
         })
@@ -68,43 +69,15 @@ export default function privateChatHandler(
     socket.disconnect();
   }
 
-  socket.on('aliceSentKey', (data) => {
-    socket.broadcast.to(chatId).emit('aliceSentKey', data);
-    socket.broadcast
-      .to(chatId)
-      .emit(
-        'newMessage',
-        generateSocketMessage(
-          socket.data.username,
-          'notification',
-          'Произвели обмен ключами. Всё готово к общению!'
-        )
-      );
-    socket.data.encrypted = true;
+  socket.on('send-public-key', (data) => {
+    socket.nsp
+      .to(chatId).emit('receive-public-key', generateSocketMessage(socket.data.username, MessageType.PUBLIC_KEY, data.text, {}, socket.data.encrypted));
   });
 
-  socket.on('bobSentKey', (data) => {
-    socket.broadcast.to(chatId).emit('bobSentKey', data);
-    socket.broadcast
-      .to(chatId)
-      .emit(
-        'newMessage',
-        generateSocketMessage(
-          socket.data.username,
-          'notification',
-          'Произвели обмен ключами. Всё готово к общению!'
-        )
-      );
-    socket.data.encrypted = true;
-  });
-
-  socket.on('newMessage', (data) => {
+  socket.on('encrypted-message', (data) => {
     socket.nsp
       .to(chatId)
-      .emit(
-        'newMessage',
-        generateSocketMessage(socket.data.username, 'message', data.text, {}, socket.data.encrypted)
-      );
+      .emit('encrypted-message', generateSocketMessage(socket.data.username, MessageType.MESSAGE, data.text, {}, socket.data.encrypted));
   });
 
   socket.on('disconnect', async () => {
@@ -114,9 +87,11 @@ export default function privateChatHandler(
         'newMessage',
         generateSocketMessage(
           socket.data.username,
-          'notification',
+          MessageType.NOTIFICATION,
           `${username} покинул чат`,
-          ChatEvents.MATE_LEFT
+          {
+            type: ChatEvents.MATE_LEFT
+          }
         )
       );
   });
