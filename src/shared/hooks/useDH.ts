@@ -21,7 +21,7 @@ const useDH = () => {
     return shared
   }, [])
 
-  const handleRecieveMessage = useCallback((message: string) => {
+  const decryptMessage = useCallback((message: string) => {
     if (!sharedKey) return;
     const decoded = decodeBase64(message);
     const nonce = decoded.slice(0, 24);
@@ -30,8 +30,19 @@ const useDH = () => {
     return plain
   }, [])
 
+  const encryptMessage = () => {
+    if (!sharedKey) return;
+    const msg = new TextEncoder().encode("Hello secret world!");
+    const nonce = nacl.randomBytes(24);
+    const box = nacl.box.after(msg, nonce, sharedKey);
+    const full = new Uint8Array(nonce.length + box.length);
+    full.set(nonce);
+    full.set(box, nonce.length);
+    return encodeBase64(full)
+  };
 
-  return { generatePublicKey, handleRecievePublicKey, handleRecieveMessage }
+
+  return { generatePublicKey, handleRecievePublicKey, decryptMessage, encryptMessage }
 }
 
 export default useDH;

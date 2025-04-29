@@ -17,6 +17,8 @@ export type Message = {
 export interface PrivateChatClientToServerEvents {
   'send-public-key': (message: Message) => void;
   'encrypted-message': (message: Message) => void
+
+  [event: string | symbol]: (...args: any[]) => void;
 }
 
 export interface PrivateChatServerToClientEvents {
@@ -24,6 +26,7 @@ export interface PrivateChatServerToClientEvents {
   newMessage: (message: Message) => void;
   'receive-public-key': (message: Message) => void
   'encrypted-message': (message: Message) => void
+  [event: string | symbol]: (...args: any[]) => void;
 }
 
 export type PrivateChatInterServerEvents = any;

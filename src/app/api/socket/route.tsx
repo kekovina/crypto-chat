@@ -29,6 +29,7 @@ export async function GET(req: NextRequest & { socket: any }) {
           origin: '*',
           methods: ['GET', 'POST'],
         },
+        transports: ['websocket'],
       });
 
       httpServer.io = io;

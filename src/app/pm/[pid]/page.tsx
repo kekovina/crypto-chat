@@ -1,17 +1,11 @@
-import { inject, observer } from 'mobx-react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import Chat from '../../components/Chat/Chat';
+import Chat from '../../../../components/Chat/Chat';
 
 function PrivateMessage() {
   const router = useRouter();
   const { pid } = router.query;
 
-  useEffect(() => {
-    store.createConnection('pm', { chatId: window.location.pathname.split('/')[2] });
-    return () => {};
-  }, []);
   return (
     <>
       <Head>
@@ -33,4 +27,4 @@ function PrivateMessage() {
   );
 }
 
-export default inject('store')(observer(PrivateMessage));
+export default PrivateMessage;
