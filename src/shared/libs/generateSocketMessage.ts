@@ -1,4 +1,4 @@
-import { Message, MessageType } from "../types/socket";
+import { MessageType, ServerMessage } from '@/shared/types/socket';
 
 export default function generateSocketMessage(
   username: string,

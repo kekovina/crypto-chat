@@ -1,11 +1,12 @@
 export const CLIENT_TO_SERVER_EVENTS_KEY = {
+  //common
+  LOGIN: 'login',
   //pm
   SEND_PUBLIC_KEY: 'send-public-key',
   ENCRYPTED_MESSAGE: 'encrypted-message',
-
   //public
-  NEW_MESSAGE: 'new-message'
-} as const
+  NEW_MESSAGE: 'new-message',
+} as const;
 
 export const SERVER_TO_CLIENT_EVENTS_KEY = {
   //common
@@ -13,16 +14,15 @@ export const SERVER_TO_CLIENT_EVENTS_KEY = {
   //pm
   RECIEVE_PUBLIC_KEY: 'receive-public-key',
   ENCRYPTED_MESSAGE: 'encrypted-message',
-  SERVER_NOTIFICATION: 'server-notification',
   //public
-  NEW_MESSAGE: 'new-message'
-} as const
+  NEW_MESSAGE: 'new-message',
+} as const;
 
 export enum MessageType {
   NOTIFICATION = 'notification',
   MESSAGE = 'message',
-  PUBLIC_KEY = 'public-key'
-};
+  PUBLIC_KEY = 'public-key',
+}
 
 export type ServerMessage = {
   type: MessageType;
@@ -30,7 +30,7 @@ export type ServerMessage = {
   username: string;
   encrypted: boolean;
   date: Date;
-  payload: Record<string, string>;
+  payload: Record<string, string | number>;
 };
 
 export interface ClientMessage {
@@ -41,20 +41,21 @@ export interface ClientMessage {
     mate?: boolean;
     role?: string;
     mateLeft?: boolean;
+    publicKey?: string;
   };
 }
 
 // pm chat
 export interface PrivateChatClientToServerEvents {
-  [CLIENT_TO_SERVER_EVENTS_KEY.SEND_PUBLIC_KEY]: (message: Message) => void;
-  [CLIENT_TO_SERVER_EVENTS_KEY.ENCRYPTED_MESSAGE]: (message: Message) => void
+  [CLIENT_TO_SERVER_EVENTS_KEY.SEND_PUBLIC_KEY]: (message: ClientMessage) => void;
+  [CLIENT_TO_SERVER_EVENTS_KEY.ENCRYPTED_MESSAGE]: (message: ClientMessage) => void;
 }
 
 export interface PrivateChatServerToClientEvents {
   [SERVER_TO_CLIENT_EVENTS_KEY.LOGIN]: ({ username }: { username: string }) => void;
-  [SERVER_TO_CLIENT_EVENTS_KEY.SERVER_NOTIFICATION]: (message: Message) => void;
-  [SERVER_TO_CLIENT_EVENTS_KEY.RECIEVE_PUBLIC_KEY]: (message: Message) => void
-  [SERVER_TO_CLIENT_EVENTS_KEY.ENCRYPTED_MESSAGE]: (message: Message) => void
+  [SERVER_TO_CLIENT_EVENTS_KEY.NEW_MESSAGE]: (message: ServerMessage) => void;
+  [SERVER_TO_CLIENT_EVENTS_KEY.RECIEVE_PUBLIC_KEY]: (message: ServerMessage) => void;
+  [SERVER_TO_CLIENT_EVENTS_KEY.ENCRYPTED_MESSAGE]: (message: ServerMessage) => void;
 }
 
 export type PrivateChatInterServerEvents = any;
@@ -66,11 +67,11 @@ export interface PrivateChatSocketData {
 
 // main chat
 export interface PublicChatClientToServerEvents {
-  [CLIENT_TO_SERVER_EVENTS_KEY.NEW_MESSAGE]: (message: Message) => void;
+  [CLIENT_TO_SERVER_EVENTS_KEY.NEW_MESSAGE]: (message: ClientMessage) => void;
 }
 
 export interface PublicChatServerToClientEvents {
-  [SERVER_TO_CLIENT_EVENTS_KEY.NEW_MESSAGE]: (message: Message) => void;
+  [SERVER_TO_CLIENT_EVENTS_KEY.NEW_MESSAGE]: (message: ServerMessage) => void;
   [SERVER_TO_CLIENT_EVENTS_KEY.LOGIN]: ({ username }: { username: string }) => void;
 }
 export type PublicChatInterServerEvents = any;
@@ -79,5 +80,5 @@ export interface PublicChatSocketData {
 }
 
 export enum ChatEvents {
-  MATE_LEFT = 'mate_left'
+  MATE_LEFT = 'mate_left',
 }

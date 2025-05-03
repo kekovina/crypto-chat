@@ -1,4 +1,6 @@
-import Chat from '../../../widget/Chat/Chat';
+'use client';
+import Chat from '@/widget/Chat/Chat';
+import { useParams } from 'next/navigation';
 
 function PrivateMessage() {
   const { pid } = useParams() as { pid: string };

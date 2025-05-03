@@ -64,6 +64,8 @@
     "stylelint-order": "^6.0.4",
     "stylelint-scss": "^6.11.1",
     "stylelint-selector-bem-pattern": "^4.0.1",
-    "typescript": "^5.7.3"
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.8.3"
   }
 }

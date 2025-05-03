@@ -25,6 +25,7 @@ app.prepare().then(() => {
   const httpServer = createServer(handler);
 
   const io = new Server(httpServer, {
+    path: '/api/socket',
     transports: ['websocket'],
     cors: {
       origin: '*',

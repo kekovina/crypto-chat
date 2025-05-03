@@ -1,4 +1,6 @@
 import { FlatCompat } from "@eslint/eslintrc";
+import unusedImports from 'eslint-plugin-unused-imports'
+import simpleImportSort from 'eslint-plugin-simple-import-sort'
 import js from "@eslint/js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -14,15 +16,15 @@ const compat = new FlatCompat({
 export default [
   ...compat.extends("next/core-web-vitals", "next/typescript", "plugin:prettier/recommended"),
   {
-    plugins: [
-      'unused-imports',
-      'simple-import-sort'
-    ],
+    plugins: {
+      unusedImports,
+      simpleImportSort
+    },
     rules: {
       "@typescript-eslint/no-require-imports": "off",
       "@typescript-eslint/no-explicit-any": "off",
-      'unused-imports/no-unused-imports': 'error',
-      'unused-imports/no-unused-vars': [
+      'unusedImports/no-unused-imports': 'error',
+      'unusedImports/no-unused-vars': [
         'warn',
         {
           vars: 'all',

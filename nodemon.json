@@ -1,5 +1,5 @@
 {
   "watch": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.sass", "src/**/*.scss"],
-  "exec": "ts-node --project tsconfig.server.json src/server.ts",
+  "exec": "ts-node -r tsconfig-paths/register --project tsconfig.server.json src/server.ts",
   "ext": "js ts"
 }
