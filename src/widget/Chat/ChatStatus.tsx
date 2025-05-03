@@ -1,11 +1,16 @@
-import { ClockLoader } from 'react-spinners';
+import { CSSProperties } from 'react';
+import ClockLoader from 'react-spinners/ClockLoader';
 
-export default function ChatStatus() {
+type ChatStatusProps = {
+  style?: CSSProperties;
+};
+
+const ChatStatus: React.FC<ChatStatusProps> = ({ style }) => {
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.href);
   };
   return (
-    <div className='chat-messages__status messages-status'>
+    <div className='chat-messages__status messages-status' style={style}>
       <div className='messages-status__wrapper'>
         <div className='messages-status__invite'>
           Пригласите человека с помощью ссылки
@@ -20,4 +25,6 @@ export default function ChatStatus() {
       </div>
     </div>
   );
-}
+};
+
+export default ChatStatus;

@@ -7,16 +7,10 @@ import {
 import { Socket } from 'socket.io';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 import generateSocketMessage from '../libs/generateSocketMessage';
-
-const debug = require('debug')('app:privateChatHandler');
+import { ChatEvents, CLIENT_TO_SERVER_EVENTS_KEY, MessageType, PrivateChatClientToServerEvents, PrivateChatInterServerEvents, PrivateChatServerToClientEvents, PrivateChatSocketData, SERVER_TO_CLIENT_EVENTS_KEY } from '../types/socket';
 
 export default function privateChatHandler(
-  socket: Socket<
-    PrivateChatClientToServerEvents,
-    PrivateChatServerToClientEvents,
-    PrivateChatInterServerEvents,
-    PrivateChatSocketData
-  >
+  socket: Socket<PrivateChatClientToServerEvents, PrivateChatServerToClientEvents, PrivateChatInterServerEvents, PrivateChatSocketData>
 ) {
   const chatId = socket.handshake.query.chatId as string;
   const username = uniqueNamesGenerator({
@@ -26,7 +20,7 @@ export default function privateChatHandler(
   });
   socket.data.username = username;
   socket.data.encrypted = false;
-  socket.emit('login', { username });
+  socket.emit(SERVER_TO_CLIENT_EVENTS_KEY.LOGIN, { username });
   if (chatId) {
     const chat = socket.nsp.adapter.rooms.get(chatId);
     if (chat) {
@@ -34,14 +28,14 @@ export default function privateChatHandler(
         debug('Bob connecting');
         socket.join(chatId);
         socket.broadcast.to(chatId).emit(
-          'pm:newMessage',
-          generateSocketMessage(socket.data.username, 'notification', `${username} вошел в чат`, {
+          SERVER_TO_CLIENT_EVENTS_KEY.SERVER_NOTIFICATION,
+          generateSocketMessage(socket.data.username, MessageType.NOTIFICATION, `${username} вошел в чат`, {
             mate: true,
           })
         );
         socket.emit(
-          'pm:newMessage',
-          generateSocketMessage(socket.data.username, 'notification', `${username} вошел в чат`, {
+          SERVER_TO_CLIENT_EVENTS_KEY.SERVER_NOTIFICATION,
+          generateSocketMessage(socket.data.username, MessageType.NOTIFICATION, `${username} вошел в чат`, {
             mate: true,
             role: 'bob',
           })
@@ -50,20 +44,20 @@ export default function privateChatHandler(
         return socket.nsp
           .to(chatId)
           .emit(
-            'pm:newMessage',
+            SERVER_TO_CLIENT_EVENTS_KEY.SERVER_NOTIFICATION,
             generateSocketMessage(
               socket.data.username,
-              'notification',
+              MessageType.NOTIFICATION,
               'Создаём безопасное соединение...'
             )
           );
       } else {
         debug('Already 2 users in chat');
         socket.emit(
-          'pm:newMessage',
+          SERVER_TO_CLIENT_EVENTS_KEY.SERVER_NOTIFICATION,
           generateSocketMessage(
             socket.data.username,
-            'notification',
+            MessageType.NOTIFICATION,
             'В этой комнате уже общаются два человека',
             { mate: true }
           )
@@ -74,8 +68,8 @@ export default function privateChatHandler(
       debug('Alice connecting');
       socket.join(chatId);
       socket.nsp.to(chatId).emit(
-        'pm:newMessage',
-        generateSocketMessage(socket.data.username, 'notification', `${username} вошел в чат`, {
+        SERVER_TO_CLIENT_EVENTS_KEY.SERVER_NOTIFICATION,
+        generateSocketMessage(socket.data.username, MessageType.NOTIFICATION, `${username} вошел в чат`, {
           mate: false,
           role: 'alice',
         })
@@ -86,69 +80,30 @@ export default function privateChatHandler(
     socket.disconnect();
   }
 
-  socket.on('aliceSentKey', (data) => {
-    debug('aliceSentKey');
-    socket.broadcast.to(chatId).emit('aliceSentKey', {
-      ...data,
-      payload: {},
-      encrypted: false,
-      username: socket.data.username,
-      type: 'notification',
-      date: new Date(),
-    });
-    socket.broadcast
-      .to(chatId)
-      .emit(
-        'pm:newMessage',
-        generateSocketMessage(
-          socket.data.username,
-          'notification',
-          'Произвели обмен ключами. Всё готово к общению!'
-        )
-      );
-    socket.data.encrypted = true;
+  socket.on(CLIENT_TO_SERVER_EVENTS_KEY.SEND_PUBLIC_KEY, (data) => {
+    socket.nsp
+      .to(chatId).emit(SERVER_TO_CLIENT_EVENTS_KEY.RECIEVE_PUBLIC_KEY, generateSocketMessage(socket.data.username, MessageType.PUBLIC_KEY, data.text, {}, socket.data.encrypted));
   });
 
-  socket.on('bobSentKey', (data) => {
-    debug('bobSentKey');
-    socket.broadcast.to(chatId).emit('bobSentKey', {
-      ...data,
-      payload: {},
-      encrypted: false,
-      username: socket.data.username,
-      type: 'notification',
-      date: new Date(),
-    });
-    socket.broadcast
-      .to(chatId)
-      .emit(
-        'pm:newMessage',
-        generateSocketMessage(
-          socket.data.username,
-          'notification',
-          'Произвели обмен ключами. Всё готово к общению!'
-        )
-      );
-    socket.data.encrypted = true;
-  });
-
-  socket.on('newMessage', (data) => {
-    debug('newMessage');
+  socket.on(CLIENT_TO_SERVER_EVENTS_KEY.ENCRYPTED_MESSAGE, (data) => {
     socket.nsp
       .to(chatId)
-      .emit(
-        'pm:newMessage',
-        generateSocketMessage(socket.data.username, 'message', data.text, {}, socket.data.encrypted)
-      );
+      .emit(SERVER_TO_CLIENT_EVENTS_KEY.ENCRYPTED_MESSAGE, generateSocketMessage(socket.data.username, MessageType.MESSAGE, data.text, {}, socket.data.encrypted));
   });
 
   socket.on('disconnect', async () => {
-    debug('disconnect');
-    socket.nsp.to(chatId).emit(
-      'pm:newMessage',
-      generateSocketMessage(socket.data.username, 'notification', `${username} покинул чат`, {
-        mateLeft: true,
-      })
-    );
+    socket.nsp
+      .to(chatId)
+      .emit(
+        SERVER_TO_CLIENT_EVENTS_KEY.SERVER_NOTIFICATION,
+        generateSocketMessage(
+          socket.data.username,
+          MessageType.NOTIFICATION,
+          `${username} покинул чат`,
+          {
+            type: ChatEvents.MATE_LEFT
+          }
+        )
+      );
   });
 }
