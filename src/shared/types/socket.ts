@@ -1,3 +1,23 @@
+export const CLIENT_TO_SERVER_EVENTS_KEY = {
+  //pm
+  SEND_PUBLIC_KEY: 'send-public-key',
+  ENCRYPTED_MESSAGE: 'encrypted-message',
+
+  //public
+  NEW_MESSAGE: 'new-message'
+} as const
+
+export const SERVER_TO_CLIENT_EVENTS_KEY = {
+  //common
+  LOGIN: 'login',
+  //pm
+  RECIEVE_PUBLIC_KEY: 'receive-public-key',
+  ENCRYPTED_MESSAGE: 'encrypted-message',
+  SERVER_NOTIFICATION: 'server-notification',
+  //public
+  NEW_MESSAGE: 'new-message'
+} as const
+
 export enum MessageType {
   NOTIFICATION = 'notification',
   MESSAGE = 'message',
@@ -15,18 +35,15 @@ export type Message = {
 
 // pm chat
 export interface PrivateChatClientToServerEvents {
-  'send-public-key': (message: Message) => void;
-  'encrypted-message': (message: Message) => void
-
-  [event: string | symbol]: (...args: any[]) => void;
+  [CLIENT_TO_SERVER_EVENTS_KEY.SEND_PUBLIC_KEY]: (message: Message) => void;
+  [CLIENT_TO_SERVER_EVENTS_KEY.ENCRYPTED_MESSAGE]: (message: Message) => void
 }
 
 export interface PrivateChatServerToClientEvents {
-  login: ({ username }: { username: string }) => void;
-  newMessage: (message: Message) => void;
-  'receive-public-key': (message: Message) => void
-  'encrypted-message': (message: Message) => void
-  [event: string | symbol]: (...args: any[]) => void;
+  [SERVER_TO_CLIENT_EVENTS_KEY.LOGIN]: ({ username }: { username: string }) => void;
+  [SERVER_TO_CLIENT_EVENTS_KEY.SERVER_NOTIFICATION]: (message: Message) => void;
+  [SERVER_TO_CLIENT_EVENTS_KEY.RECIEVE_PUBLIC_KEY]: (message: Message) => void
+  [SERVER_TO_CLIENT_EVENTS_KEY.ENCRYPTED_MESSAGE]: (message: Message) => void
 }
 
 export type PrivateChatInterServerEvents = any;
@@ -38,12 +55,12 @@ export interface PrivateChatSocketData {
 
 // main chat
 export interface PublicChatClientToServerEvents {
-  newMessage: (message: Message) => void;
+  [CLIENT_TO_SERVER_EVENTS_KEY.NEW_MESSAGE]: (message: Message) => void;
 }
 
 export interface PublicChatServerToClientEvents {
-  newMessage: (message: Message) => void;
-  login: ({ username }: { username: string }) => void;
+  [SERVER_TO_CLIENT_EVENTS_KEY.NEW_MESSAGE]: (message: Message) => void;
+  [SERVER_TO_CLIENT_EVENTS_KEY.LOGIN]: ({ username }: { username: string }) => void;
 }
 export type PublicChatInterServerEvents = any;
 export interface PublicChatSocketData {

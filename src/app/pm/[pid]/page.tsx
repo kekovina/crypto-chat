@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import Chat from '../../../../components/Chat/Chat';
+import Chat from '../../../widget/Chat/Chat';
 
 function PrivateMessage() {
   const router = useRouter();

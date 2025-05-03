@@ -1,7 +1,7 @@
 import { Socket } from 'socket.io';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 import generateSocketMessage from '../libs/generateSocketMessage';
-import { ChatEvents, MessageType, PrivateChatClientToServerEvents, PrivateChatInterServerEvents, PrivateChatServerToClientEvents, PrivateChatSocketData } from '../types/socket';
+import { ChatEvents, CLIENT_TO_SERVER_EVENTS_KEY, MessageType, PrivateChatClientToServerEvents, PrivateChatInterServerEvents, PrivateChatServerToClientEvents, PrivateChatSocketData, SERVER_TO_CLIENT_EVENTS_KEY } from '../types/socket';
 
 export default function privateChatHandler(
   socket: Socket<PrivateChatClientToServerEvents, PrivateChatServerToClientEvents, PrivateChatInterServerEvents, PrivateChatSocketData>
@@ -14,20 +14,20 @@ export default function privateChatHandler(
   });
   socket.data.username = username;
   socket.data.encrypted = false;
-  socket.emit('login', { username });
+  socket.emit(SERVER_TO_CLIENT_EVENTS_KEY.LOGIN, { username });
   if (chatId) {
     const chat = socket.nsp.adapter.rooms.get(chatId);
     if (chat) {
       if (chat.size < 2) {
         socket.join(chatId);
         socket.broadcast.to(chatId).emit(
-          'newMessage',
+          SERVER_TO_CLIENT_EVENTS_KEY.SERVER_NOTIFICATION,
           generateSocketMessage(socket.data.username, MessageType.NOTIFICATION, `${username} вошел в чат`, {
             mate: true,
           })
         );
         socket.emit(
-          'newMessage',
+          SERVER_TO_CLIENT_EVENTS_KEY.SERVER_NOTIFICATION,
           generateSocketMessage(socket.data.username, MessageType.NOTIFICATION, `${username} вошел в чат`, {
             mate: true,
             role: 'bob',
@@ -36,7 +36,7 @@ export default function privateChatHandler(
         socket.nsp
           .to(chatId)
           .emit(
-            'newMessage',
+            SERVER_TO_CLIENT_EVENTS_KEY.SERVER_NOTIFICATION,
             generateSocketMessage(
               socket.data.username,
               MessageType.NOTIFICATION,
@@ -45,7 +45,7 @@ export default function privateChatHandler(
           );
       } else {
         socket.emit(
-          'newMessage',
+          SERVER_TO_CLIENT_EVENTS_KEY.SERVER_NOTIFICATION,
           generateSocketMessage(
             socket.data.username,
             MessageType.NOTIFICATION,
@@ -58,7 +58,7 @@ export default function privateChatHandler(
     } else {
       socket.join(chatId);
       socket.nsp.to(chatId).emit(
-        'newMessage',
+        SERVER_TO_CLIENT_EVENTS_KEY.SERVER_NOTIFICATION,
         generateSocketMessage(socket.data.username, MessageType.NOTIFICATION, `${username} вошел в чат`, {
           mate: false,
           role: 'alice',
@@ -69,22 +69,22 @@ export default function privateChatHandler(
     socket.disconnect();
   }
 
-  socket.on('send-public-key', (data) => {
+  socket.on(CLIENT_TO_SERVER_EVENTS_KEY.SEND_PUBLIC_KEY, (data) => {
     socket.nsp
-      .to(chatId).emit('receive-public-key', generateSocketMessage(socket.data.username, MessageType.PUBLIC_KEY, data.text, {}, socket.data.encrypted));
+      .to(chatId).emit(SERVER_TO_CLIENT_EVENTS_KEY.RECIEVE_PUBLIC_KEY, generateSocketMessage(socket.data.username, MessageType.PUBLIC_KEY, data.text, {}, socket.data.encrypted));
   });
 
-  socket.on('encrypted-message', (data) => {
+  socket.on(CLIENT_TO_SERVER_EVENTS_KEY.ENCRYPTED_MESSAGE, (data) => {
     socket.nsp
       .to(chatId)
-      .emit('encrypted-message', generateSocketMessage(socket.data.username, MessageType.MESSAGE, data.text, {}, socket.data.encrypted));
+      .emit(SERVER_TO_CLIENT_EVENTS_KEY.ENCRYPTED_MESSAGE, generateSocketMessage(socket.data.username, MessageType.MESSAGE, data.text, {}, socket.data.encrypted));
   });
 
   socket.on('disconnect', async () => {
     socket.nsp
       .to(chatId)
       .emit(
-        'newMessage',
+        SERVER_TO_CLIENT_EVENTS_KEY.SERVER_NOTIFICATION,
         generateSocketMessage(
           socket.data.username,
           MessageType.NOTIFICATION,
