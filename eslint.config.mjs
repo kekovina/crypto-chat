@@ -1,7 +1,7 @@
 import { FlatCompat } from "@eslint/eslintrc";
-import unusedImports from 'eslint-plugin-unused-imports'
-import simpleImportSort from 'eslint-plugin-simple-import-sort'
 import js from "@eslint/js";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
+import unusedImports from "eslint-plugin-unused-imports";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -18,19 +18,19 @@ export default [
   {
     plugins: {
       unusedImports,
-      simpleImportSort
+      simpleImportSort,
     },
     rules: {
       "@typescript-eslint/no-require-imports": "off",
       "@typescript-eslint/no-explicit-any": "off",
-      'unusedImports/no-unused-imports': 'error',
-      'unusedImports/no-unused-vars': [
-        'warn',
+      "unusedImports/no-unused-imports": "error",
+      "unusedImports/no-unused-vars": [
+        "warn",
         {
-          vars: 'all',
-          varsIgnorePattern: '^_',
-          args: 'after-used',
-          argsIgnorePattern: '^_',
+          vars: "all",
+          varsIgnorePattern: "^_",
+          args: "after-used",
+          argsIgnorePattern: "^_",
         },
       ],
     },
