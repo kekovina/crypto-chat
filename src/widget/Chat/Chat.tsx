@@ -1,5 +1,6 @@
 'use client';
 
+import { useCryptoWorker } from '@/shared/hooks/useCryptoWorker';
 import useDH from '@/shared/hooks/useDH';
 import { useSocket } from '@/shared/hooks/useSocket';
 import {
@@ -66,9 +67,10 @@ export default function Chat({ pid }: { pid?: string }) {
   const { emit, on, off } = useSocket(connectionOpts);
   const { online, mate, username, messages, setUsername, addMessage, setOnline, setMate } =
     useStore(chatStore);
-  const { encryptMessage, sharedKey, receiveTheirPublicKey, getMyPublicKeyBase64, decryptMessage } =
-    useDH();
+  const { sharedKey, receiveTheirPublicKey, getMyPublicKeyBase64 } = useDH();
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const { encrypt, decrypt } = useCryptoWorker();
 
   const isPrivateMessage = pid ? true : false;
 
@@ -95,8 +97,11 @@ export default function Chat({ pid }: { pid?: string }) {
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 0);
     };
 
-    const encryptedMessageHandler = (message: ServerMessage) => {
-      const decryptedMessage = { ...message, text: decryptMessage(message.text as string) };
+    const encryptedMessageHandler = async (message: ServerMessage) => {
+      const decryptedMessage = {
+        ...message,
+        text: await decrypt(message.text, sharedKey as Uint8Array),
+      };
       addMessage(decryptedMessage);
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 0);
     };
@@ -124,14 +129,14 @@ export default function Chat({ pid }: { pid?: string }) {
     }
   }, [sharedKey]);
 
-  const onSendMessage = function (e: React.FormEvent<HTMLFormElement>) {
+  const onSendMessage = async function (e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const inputElement = (e.target as HTMLFormElement).elements[0] as HTMLInputElement;
     const message = inputElement.value;
     if (message) {
       if (isPrivateMessage) {
         emit(CLIENT_TO_SERVER_EVENTS_KEY.ENCRYPTED_MESSAGE, {
-          text: encryptMessage(message),
+          text: await encrypt(message, sharedKey as Uint8Array),
           encrypted: true,
         });
       } else {
