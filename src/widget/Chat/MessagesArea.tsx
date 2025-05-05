@@ -28,10 +28,7 @@ export default function MessagesArea({
         messages[index - 1]?.type == 'notification' ||
         dayjs(message.date).diff(dayjs(messages[index - 1]?.date), 'seconds') > 60;
       return (
-        <div
-          className='message message--message'
-          key={new Date(message?.date).getTime() + Math.round(Math.random() * 1250)}
-        >
+        <div className='message message--message' key={message.id}>
           {showHeader ? (
             <div className='message__header'>
               <div className={authorClasses}>{message.username}</div>

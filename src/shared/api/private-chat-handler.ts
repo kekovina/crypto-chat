@@ -41,13 +41,7 @@ export default function privateChatHandler(
       .to(chatId)
       .emit(
         SERVER_TO_CLIENT_EVENTS_KEY.ENCRYPTED_MESSAGE,
-        generateSocketMessage(
-          socket.data.username,
-          MessageType.MESSAGE,
-          data.text,
-          {},
-          data.encrypted
-        )
+        generateSocketMessage(socket.data.username, MessageType.MESSAGE, data.text, {})
       );
   });
 
@@ -66,7 +60,6 @@ export default function privateChatHandler(
   });
 
   socket.data.username = username;
-  socket.data.encrypted = false;
   socket.emit(SERVER_TO_CLIENT_EVENTS_KEY.LOGIN, { username });
 
   if (chatId) {

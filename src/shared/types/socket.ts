@@ -25,10 +25,10 @@ export enum MessageType {
 }
 
 export type ServerMessage = {
+  id: string;
   type: MessageType;
   text: string;
   username: string;
-  encrypted: boolean;
   date: Date;
   payload: Record<string, string | number>;
 };
@@ -62,7 +62,6 @@ export type PrivateChatInterServerEvents = any;
 
 export interface PrivateChatSocketData {
   username: string;
-  encrypted: boolean;
 }
 
 // main chat

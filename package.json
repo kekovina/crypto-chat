@@ -41,6 +41,7 @@
     "tailwindcss": "^4.0.8",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
+    "ulid": "^3.0.0",
     "unique-names-generator": "^4.7.1",
     "uuid": "^11.1.0",
     "zustand": "^5.0.4"
