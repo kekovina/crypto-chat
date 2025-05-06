@@ -1,5 +1,6 @@
 'use client';
 
+import copyToClipboard from '@/shared/libs/copyToClipboard';
 import LockIcon from '@/shared/ui/LockIcon';
 import { chatStore } from '@/widget/Chat/model';
 import ChatStatus from '@/widget/Chat/ui/ChatStatus';
@@ -59,7 +60,7 @@ export default function SecureChat({ pid }: { pid?: string }) {
             action={
               <button
                 className='btn btn--gray btn--sm mx-1'
-                onClick={() => navigator.clipboard.writeText(window.location.href)}
+                onClick={() => copyToClipboard(window.location.href)}
               >
                 Скопировать
               </button>
