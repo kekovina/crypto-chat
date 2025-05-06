@@ -1,3 +1,5 @@
+@import "responsive";
+
 .chat {
   display: flex;
   flex-direction: column;
@@ -5,6 +7,10 @@
   justify-content: space-between;
   overflow: hidden;
   height: 600px;
+
+  @include respondto(xs, sm) {
+    height: 100%;
+  }
 
   &__header {
     box-sizing: border-box;
