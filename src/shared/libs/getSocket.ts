@@ -8,7 +8,7 @@ export function getSocket(url = '/', options?: Partial<ManagerOptions & SocketOp
   if (!sockets.has(fullUrl)) {
     const socket = io(url, {
       path: '/api/socket',
-      transports: ['websocket'],
+      transports: process.env.NEXT_PUBLIC_VERCEL == '1' ? ['polling'] : ['websocket'],
       autoConnect: true,
       ...options,
     });

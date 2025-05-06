@@ -14,6 +14,7 @@ const withPWA = require('next-pwa')({
 
 const configuration = {
   NEXT_PUBLIC_DOMAIN: process.env.DOMAIN,
+  NEXT_PUBLIC_VERCEL: process.env.VERCEL,
   DOMAIN: process.env.DOMAIN,
   VERCEL: process.env.VERCEL,
 };
@@ -24,8 +25,6 @@ if (process.env.VERCEL) {
       ? process.env.VERCEL_URL
       : process.env.DOMAIN;
 }
-
-console.log(configuration);
 
 const configurationValidation = Joi.object({
   DOMAIN: Joi.string().description('домен приложения').default('localhost'),
