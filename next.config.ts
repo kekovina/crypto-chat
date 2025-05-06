@@ -18,14 +18,14 @@ const configuration = {
   VERCEL: process.env.VERCEL,
 };
 
-console.log(configuration);
-
 if (process.env.VERCEL) {
-  configuration.NEXT_PUBLIC_DOMAIN = configuration.NEXT_PUBLIC_DOMAIN =
+  configuration.NEXT_PUBLIC_DOMAIN = configuration.DOMAIN =
     process.env.VERCEL === '1' && process.env.VERCEL_URL
       ? process.env.VERCEL_URL
       : process.env.DOMAIN;
 }
+
+console.log(configuration);
 
 const configurationValidation = Joi.object({
   DOMAIN: Joi.string().description('домен приложения').default('localhost'),

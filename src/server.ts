@@ -26,7 +26,7 @@ app.prepare().then(() => {
 
   const io = new Server(httpServer, {
     path: '/api/socket',
-    transports: process.env.VERCEL === '1' ? ['polling'] : ['websocket'],
+    transports: process.env.VERCEL == '1' ? ['polling'] : ['websocket'],
     cors: {
       origin: '*',
       methods: ['GET', 'POST'],
