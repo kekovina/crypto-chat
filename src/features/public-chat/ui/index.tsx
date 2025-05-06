@@ -2,12 +2,13 @@
 
 import { chatStore } from '@/widget/Chat/model';
 import MessagesArea from '@/widget/Chat/ui/MessagesArea';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useStore } from 'zustand';
 import { usePublicChat } from '../model/usePublicChat';
 
 export default function PublicChat() {
-  const { online, username, messages, setUsername, addMessage, setOnline } = useStore(chatStore);
+  const { online, username, messages, setUsername, addMessage, setOnline, resetMessages } =
+    useStore(chatStore);
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -19,6 +20,10 @@ export default function PublicChat() {
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 0);
     },
   });
+
+  useEffect(() => {
+    resetMessages();
+  }, []);
 
   return (
     <div className='chat'>

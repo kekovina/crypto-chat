@@ -6,13 +6,13 @@ import { chatStore } from '@/widget/Chat/model';
 import ChatStatus from '@/widget/Chat/ui/ChatStatus';
 import MessagesArea from '@/widget/Chat/ui/MessagesArea';
 import { useRouter } from 'next/navigation';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import ClockLoader from 'react-spinners/ClockLoader';
 import { useStore } from 'zustand';
 import { useSecureChat } from '../model/useSecureChat';
 
 export default function SecureChat({ pid }: { pid?: string }) {
-  const { username, messages, setUsername, addMessage } = useStore(chatStore);
+  const { username, messages, setUsername, addMessage, resetMessages } = useStore(chatStore);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const { onSendMessage, emoji, isMateConnected, error } = useSecureChat(pid, {
@@ -24,6 +24,10 @@ export default function SecureChat({ pid }: { pid?: string }) {
   });
 
   const navigate = useRouter();
+
+  useEffect(() => {
+    resetMessages();
+  }, []);
 
   const isDisabledMessages = !username || !isMateConnected;
 
@@ -56,7 +60,7 @@ export default function SecureChat({ pid }: { pid?: string }) {
         )}
         {!isMateConnected && !error && (
           <ChatStatus
-            title='Пригласите собеседника с помощьюссылки'
+            title='Пригласите собеседника с помощью ссылки'
             action={
               <button
                 className='btn btn--gray btn--sm mx-1'

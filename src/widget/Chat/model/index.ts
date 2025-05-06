@@ -6,6 +6,7 @@ export type ChatStore = {
 
   messages: any[];
   addMessage: (value: any) => void;
+  resetMessages: () => void;
 
   online: number;
   setOnline: (value: number) => void;
@@ -24,6 +25,7 @@ export const chatStore = create<ChatStore>((set) => ({
       messages: Array.isArray(value) ? [...state.messages, ...value] : [...state.messages, value],
     }));
   },
+  resetMessages: () => set({ messages: [] }),
 
   online: 0,
   setOnline: (value) => set({ online: value }),
