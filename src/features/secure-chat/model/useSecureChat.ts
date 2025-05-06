@@ -1,4 +1,3 @@
-import emojiList from '@/shared/config/emoji';
 import { useCryptoWorker } from '@/shared/hooks/useCryptoWorker';
 import useDH from '@/shared/hooks/useDH';
 import { useSocket } from '@/shared/hooks/useSocket';
@@ -8,17 +7,8 @@ import {
   SERVER_TO_CLIENT_EVENTS_KEY,
   ServerMessage,
 } from '@/shared/types/socket';
-import { useEffect, useMemo, useState } from 'react';
-
-const sha256 = async (data: Uint8Array): Promise<Uint8Array> => {
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  return new Uint8Array(hashBuffer);
-};
-
-const getEmoji = (sharedKeySHA: Uint8Array) => {
-  const bytes = sharedKeySHA.slice(0, 6);
-  return bytes.reduce((acc, byte) => acc + emojiList[byte % emojiList.length], '');
-};
+import { useEffect, useState } from 'react';
+import { getEmoji, sha256 } from '../utils';
 
 type UseSecureChatConfig = {
   onMessageReceived?: (message: ServerMessage) => void;
@@ -29,12 +19,7 @@ export function useSecureChat(pid?: string, config: UseSecureChatConfig = {}) {
   const [emoji, setEmoji] = useState<string | null>(null);
   const [isMateConnected, setIsMateConnected] = useState(false);
 
-  const connectionOpts = useMemo(
-    () => (pid ? { url: '/pm', query: { chatId: pid } } : { url: '/chat' }),
-    [pid]
-  );
-
-  const { emit, on, off } = useSocket(connectionOpts);
+  const { emit, on, off } = useSocket({ url: '/pm', query: { chatId: pid } });
   const { encrypt, decrypt } = useCryptoWorker();
   const { sharedKey, receiveTheirPublicKey, getMyPublicKeyBase64 } = useDH();
 
