@@ -3,6 +3,15 @@ import { NextConfig } from 'next';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 
+const isDev = process.env.NODE_ENV === 'development';
+
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  disable: isDev,
+});
+
 const configuration = {
   NEXT_PUBLIC_DOMAIN: process.env.DOMAIN,
 };
@@ -69,4 +78,4 @@ const nextConfig: NextConfig = {
     ];
   },
 };
-export default nextConfig;
+export default withPWA(nextConfig);
