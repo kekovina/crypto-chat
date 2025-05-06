@@ -1,0 +1,91 @@
+import Joi from 'joi';
+import { NextConfig } from 'next';
+import { writeFileSync } from 'node:fs';
+import path from 'node:path';
+
+const isDev = process.env.NODE_ENV === 'development';
+
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  disable: isDev,
+});
+
+const configuration = {
+  NEXT_PUBLIC_DOMAIN: process.env.DOMAIN,
+  NEXT_PUBLIC_VERCEL: process.env.VERCEL,
+  DOMAIN: process.env.DOMAIN,
+  VERCEL: process.env.VERCEL,
+};
+
+if (process.env.VERCEL) {
+  configuration.NEXT_PUBLIC_DOMAIN = configuration.DOMAIN =
+    process.env.VERCEL === '1' && process.env.VERCEL_URL
+      ? process.env.VERCEL_URL
+      : process.env.DOMAIN;
+}
+
+const configurationValidation = Joi.object({
+  DOMAIN: Joi.string().description('домен приложения').default('localhost'),
+});
+
+const sampleEnvDocumentation = () => {
+  const joiModel = configurationValidation.describe();
+  let output = '';
+  Object.keys(joiModel.keys).forEach((key) => {
+    const keyObject = joiModel.keys[key];
+    const description = keyObject?.flags?.description;
+    const finalDescription = description ? `# ${description}\n` : '';
+
+    let value = `<${key}>`;
+    if (keyObject?.flags?.default) {
+      value = keyObject.flags.default;
+    }
+    if (keyObject?.allow) {
+      value = `<${keyObject.allow.join(' | ')}>`;
+    }
+
+    output += `${finalDescription}${key}=${value}\n`;
+  });
+  writeFileSync(path.join(process.cwd(), '.env.example'), output);
+};
+sampleEnvDocumentation();
+
+const validationResult = configurationValidation.validate(process.env, {
+  abortEarly: false,
+  allowUnknown: true,
+});
+
+const errorDetails = validationResult?.error?.details;
+if (errorDetails?.length) {
+  let finalError = '';
+  errorDetails.forEach((item) => {
+    finalError += `${item.message}\n`;
+  });
+  throw new Error(finalError);
+}
+
+const nextConfig: NextConfig = {
+  reactStrictMode: false,
+  env: configuration,
+
+  async headers() {
+    return [
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Access-Control-Allow-Origin', value: `https://${process.env.DOMAIN}` },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,OPTIONS,PATCH,DELETE,POST,PUT' },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value:
+              'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
+          },
+        ],
+      },
+    ];
+  },
+};
+export default withPWA(nextConfig);

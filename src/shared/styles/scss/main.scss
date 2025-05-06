@@ -1,0 +1,131 @@
+@use "sass:color";
+
+@import "~normalize.css";
+@import "variables";
+@import "responsive";
+@import "fonts";
+@import "chat";
+
+body {
+  font-family: "Ubuntu", sans-serif;
+  color: $text-color;
+  background-color: $bg-color;
+}
+
+main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
+
+  @include respondto(xs, sm) {
+    align-items: unset;
+    padding: 10px 0;
+    height: 100dvh;
+  }
+}
+
+.content {
+  width: 100%;
+  max-width: 1380px;
+
+  @include respond(1500) {
+    max-width: 70%;
+  }
+
+  &__wrapper {
+    display: flex;
+    row-gap: 40px;
+    align-items: center;
+
+    @include respondto(xs, sm) {
+      flex-direction: column;
+      height: 100%;
+    }
+  }
+
+  &__description {
+    width: 100%;
+    font-family: "AmaticSC", sans-serif;
+  }
+
+  &__chat {
+    border: 1px solid rgb(202 202 202 / 26%);
+    border-radius: 12px;
+    width: 100%;
+    height: 600px;
+    animation: shining 5s infinite ease-in-out;
+
+    @include respondto(xs, sm) {
+      height: 100%;
+    }
+  }
+
+  @include respondto(xs, sm) {
+    max-width: 95%;
+  }
+}
+
+.description {
+  font-family: "AmaticSC", sans-serif;
+  font-size: 30px;
+  text-align: center;
+  color: $text-color;
+
+  &__title {
+    margin-bottom: 1rem;
+    font-weight: 700;
+  }
+}
+
+.btn {
+  display: block;
+  outline: none;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 16px;
+  width: fit-content;
+  font-size: 18px;
+  text-decoration: none;
+  color: black;
+  cursor: pointer;
+  transition: 0.15s ease-in-out;
+
+  &--gray {
+    color: $text-color;
+    background-color: $gray-1;
+
+    &:hover {
+      color: $text-color;
+      background: #cacaca30;
+      transition: 0.15s ease-in-out;
+    }
+  }
+
+  &--sm {
+    padding: 5px;
+    font-size: 14px;
+    line-height: 16px;
+  }
+
+  &--center {
+    margin: 0 auto;
+  }
+}
+
+@keyframes shining {
+  0% {
+    box-shadow: 0 0 73px 0 rgb(202 202 202 / 26%);
+  }
+
+  50% {
+    box-shadow: 0 0 73px -23px rgb(202 202 202 / 26%);
+  }
+
+  100% {
+    box-shadow: 0 0 73px 0 rgb(202 202 202 / 26%);
+  }
+}
