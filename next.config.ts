@@ -18,9 +18,10 @@ const configuration = {
 };
 
 if (process.env.VERCEL) {
-  configuration.NEXT_PUBLIC_DOMAIN = process.env.VERCEL_URL
-    ? new URL(process.env.VERCEL_URL).host
-    : process.env.DOMAIN;
+  configuration.NEXT_PUBLIC_DOMAIN =
+    process.env.VERCEL === '1' && process.env.VERCEL_URL
+      ? process.env.VERCEL_URL
+      : process.env.DOMAIN;
 }
 
 const configurationValidation = Joi.object({
