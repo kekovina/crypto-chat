@@ -45,7 +45,7 @@ export function useSecureChat(pid?: string, config: UseSecureChatConfig = {}) {
       on(SERVER_TO_CLIENT_EVENTS_KEY.RECIEVE_PUBLIC_KEY, publicKeyHandler);
       return () => off(SERVER_TO_CLIENT_EVENTS_KEY.RECIEVE_PUBLIC_KEY, publicKeyHandler);
     }
-  }, [pid]);
+  }, [pid, off, on, receiveTheirPublicKey]);
 
   useEffect(() => {
     if (sharedKey) {
@@ -104,7 +104,7 @@ export function useSecureChat(pid?: string, config: UseSecureChatConfig = {}) {
         off(SERVER_TO_CLIENT_EVENTS_KEY.ENCRYPTED_MESSAGE, encryptedMessageHandler);
       };
     }
-  }, [pid, sharedKey]);
+  }, [pid, sharedKey, off, on, receiveTheirPublicKey, getMyPublicKeyBase64, decrypt]);
 
   const onSendMessage = async function (e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

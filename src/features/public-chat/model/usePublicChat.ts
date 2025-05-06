@@ -26,7 +26,7 @@ export function usePublicChat(config: UsePublicChatConfig = {}) {
       off(SERVER_TO_CLIENT_EVENTS_KEY.LOGIN, loginHandler);
       off(SERVER_TO_CLIENT_EVENTS_KEY.NEW_MESSAGE, messageHandler);
     };
-  }, []);
+  }, [config, off, on]);
 
   const onSendMessage = async function (e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

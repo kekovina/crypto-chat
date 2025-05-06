@@ -9,7 +9,6 @@
     "esModuleInterop": true,
     "module": "esnext",
     "target": "es2015",
-    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -22,7 +21,8 @@
     ],
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+    "moduleResolution": "node"
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]

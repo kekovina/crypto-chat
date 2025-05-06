@@ -21,22 +21,25 @@ export function useSocket<
 
   useEffect(() => {
     return () => {
-      socketRef.current?.removeAllListeners(); // не disconnect, если хочешь singleton
+      socketRef.current?.removeAllListeners();
     };
   }, []);
 
   const emit = useCallback(
     <K extends keyof ServerEvents>(event: K, ...args: Parameters<ServerEvents[K]>) => {
+      // @ts-expect-error hard type
       socketRef.current?.emit(event as string, ...args);
     },
     []
   );
 
   const on = <K extends keyof ClientEvents>(event: K, callback: ClientEvents[K]) => {
+    // @ts-expect-error hard type
     socketRef.current?.on(event as string, callback);
   };
 
   const off = <K extends keyof ClientEvents>(event: K, callback: ClientEvents[K]) => {
+    // @ts-expect-error hard type
     socketRef.current?.off(event as string, callback);
   };
 
