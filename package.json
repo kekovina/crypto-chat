@@ -9,7 +9,9 @@
     "lint": "next lint",
     "prepare": "husky install",
     "lint:js": "eslint --fix --ignore-pattern \"\\.next\"  \"**/*.{js,jsx,ts,tsx}\"",
-    "lint:css": "stylelint --fix --ignore-pattern \"\\.next\"  \"**/*.{css,scss}\""
+    "lint:css": "stylelint --fix --ignore-pattern \"\\.next\"  \"**/*.{css,scss}\"",
+    "changeset": "changeset",
+    "version-packages": "changeset version"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -47,6 +49,7 @@
     "zustand": "^5.0.4"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.3",
     "@types/react": "19.0.10",
     "eslint-config-next": "^15.1.7",
     "eslint-config-prettier": "^10.0.1",
