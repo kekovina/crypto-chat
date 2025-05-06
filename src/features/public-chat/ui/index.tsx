@@ -1,7 +1,7 @@
 'use client';
 
-import MessagesArea from '@/widget/Chat/MessagesArea';
 import { chatStore } from '@/widget/Chat/model';
+import MessagesArea from '@/widget/Chat/ui/MessagesArea';
 import { useRef } from 'react';
 import { useStore } from 'zustand';
 import { usePublicChat } from '../model/usePublicChat';
@@ -14,7 +14,6 @@ export default function PublicChat() {
   const { onSendMessage } = usePublicChat({
     onLogin: (username) => setUsername(username),
     onMessageReceived: (message) => {
-      console.log(message);
       addMessage(message);
       setOnline(message.payload.users as number);
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 0);

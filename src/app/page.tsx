@@ -1,5 +1,5 @@
 import '@/shared/styles/scss/main.scss';
-import Chat from '@/widget/Chat/Chat';
+import Chat from '@/widget/Chat';
 import Link from 'next/link';
 
 export default function HomePage() {

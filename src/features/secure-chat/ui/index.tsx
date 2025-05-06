@@ -1,9 +1,9 @@
 'use client';
 
 import LockIcon from '@/shared/ui/LockIcon';
-import ChatStatus from '@/widget/Chat/ChatStatus';
-import MessagesArea from '@/widget/Chat/MessagesArea';
 import { chatStore } from '@/widget/Chat/model';
+import ChatStatus from '@/widget/Chat/ui/ChatStatus';
+import MessagesArea from '@/widget/Chat/ui/MessagesArea';
 import { useRef } from 'react';
 import { useStore } from 'zustand';
 import { useSecureChat } from '../model/useSecureChat';
