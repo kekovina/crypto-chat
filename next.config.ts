@@ -14,11 +14,14 @@ const withPWA = require('next-pwa')({
 
 const configuration = {
   NEXT_PUBLIC_DOMAIN: process.env.DOMAIN,
+  DOMAIN: process.env.DOMAIN,
   VERCEL: process.env.VERCEL,
 };
 
+console.log(configuration);
+
 if (process.env.VERCEL) {
-  configuration.NEXT_PUBLIC_DOMAIN =
+  configuration.NEXT_PUBLIC_DOMAIN = configuration.NEXT_PUBLIC_DOMAIN =
     process.env.VERCEL === '1' && process.env.VERCEL_URL
       ? process.env.VERCEL_URL
       : process.env.DOMAIN;
