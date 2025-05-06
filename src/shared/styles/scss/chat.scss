@@ -166,6 +166,11 @@
     }
   }
 
+  &__error-title {
+    line-height: 0;
+    color: rgb(244 104 104 / 80%);
+  }
+
   &__status {
     width: 100%;
     background-color: $gray-2;

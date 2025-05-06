@@ -13,11 +13,23 @@ import { getEmoji, sha256 } from '../utils';
 type UseSecureChatConfig = {
   onMessageReceived?: (message: ServerMessage) => void;
   onLogin?: (username: string) => void;
+  onMateLeft?: () => void;
+};
+
+export enum ServerErrorCode {
+  ALREADY_CONNECTED = 'ALREADY_CONNECTED',
+}
+
+type ErrorState = {
+  code: ServerErrorCode;
+  message: string;
+  title: string;
 };
 
 export function useSecureChat(pid?: string, config: UseSecureChatConfig = {}) {
   const [emoji, setEmoji] = useState<string | null>(null);
   const [isMateConnected, setIsMateConnected] = useState(false);
+  const [error, setError] = useState<ErrorState | null>(null);
 
   const { emit, on, off } = useSocket({ url: '/pm', query: { chatId: pid } });
   const { encrypt, decrypt } = useCryptoWorker();
@@ -56,9 +68,22 @@ export function useSecureChat(pid?: string, config: UseSecureChatConfig = {}) {
         });
         setIsMateConnected(true);
       }
+
       if (event === ChatEvents.MATE_LEFT) {
+        config.onMateLeft?.();
         setIsMateConnected(false);
+        setEmoji(null);
       }
+
+      if (event === ChatEvents.ALREADY_CONNECTED) {
+        setIsMateConnected(false);
+        setError({
+          code: ServerErrorCode.ALREADY_CONNECTED,
+          title: 'Отключён сервером',
+          message: 'В этом чате уже находится два пользователя',
+        });
+      }
+
       config.onMessageReceived?.(msg);
     };
     const encryptedMessageHandler = async (message: ServerMessage) => {
@@ -95,6 +120,7 @@ export function useSecureChat(pid?: string, config: UseSecureChatConfig = {}) {
   };
 
   return {
+    error,
     emoji,
     sharedKey,
     isMateConnected,

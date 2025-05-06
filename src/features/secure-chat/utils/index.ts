@@ -6,6 +6,6 @@ export const sha256 = async (data: Uint8Array): Promise<Uint8Array> => {
 };
 
 export const getEmoji = (sharedKeySHA: Uint8Array) => {
-  const bytes = sharedKeySHA.slice(0, 6);
+  const bytes = sharedKeySHA.slice(0, 4);
   return bytes.reduce((acc, byte) => acc + emojiList[byte % emojiList.length], '');
 };

@@ -1,27 +1,21 @@
 import { CSSProperties } from 'react';
-import ClockLoader from 'react-spinners/ClockLoader';
 
 type ChatStatusProps = {
+  title: React.ReactNode;
+  body: React.ReactNode;
+  action?: React.ReactNode;
   style?: CSSProperties;
 };
 
-const ChatStatus: React.FC<ChatStatusProps> = ({ style }) => {
-  const copyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-  };
+const ChatStatus: React.FC<ChatStatusProps> = ({ title, body, action, style }) => {
   return (
     <div className='chat-messages__status messages-status' style={style}>
       <div className='messages-status__wrapper'>
         <div className='messages-status__invite'>
-          Пригласите человека с помощью ссылки
-          <button className='btn btn--gray btn--sm mx-1' onClick={copyLink}>
-            Скопировать
-          </button>
+          {title}
+          {action}
         </div>
-        <div className='messages-status__status'>
-          <ClockLoader size={18} color={'#fff'} cssOverride={{ marginRight: 5 }} />
-          <div>Ожидаем собеседника...</div>
-        </div>
+        <div className='messages-status__status'>{body}</div>
       </div>
     </div>
   );

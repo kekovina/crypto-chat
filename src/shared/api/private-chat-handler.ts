@@ -1,3 +1,4 @@
+import generateSocketMessage from '@/shared/libs/generateSocketMessage';
 import {
   ChatEvents,
   CLIENT_TO_SERVER_EVENTS_KEY,
@@ -10,7 +11,13 @@ import {
 } from '@/shared/types/socket';
 import { Socket } from 'socket.io';
 import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
-import generateSocketMessage from '../libs/generateSocketMessage';
+
+type ChatRoomState = {
+  isEncrypted: boolean;
+  sendedPublicKeys: string[];
+};
+
+const chatRoomData = new Map<string, ChatRoomState>();
 
 export default function privateChatHandler(
   socket: Socket<
@@ -34,6 +41,27 @@ export default function privateChatHandler(
         publicKey: data.payload?.publicKey,
       })
     );
+    const state = chatRoomData.get(chatId);
+    if (state) {
+      state.sendedPublicKeys.push(data.payload?.publicKey as string);
+      if (state.sendedPublicKeys.length === 2) {
+        chatRoomData.set(chatId, {
+          ...state,
+          isEncrypted: true,
+        });
+        socket.nsp
+          .to(chatId)
+          .emit(
+            SERVER_TO_CLIENT_EVENTS_KEY.NEW_MESSAGE,
+            generateSocketMessage(
+              socket.data.username,
+              MessageType.NOTIFICATION,
+              'Безопасное соединение установлено',
+              {}
+            )
+          );
+      }
+    }
   });
 
   socket.on(CLIENT_TO_SERVER_EVENTS_KEY.ENCRYPTED_MESSAGE, (data) => {
@@ -46,17 +74,34 @@ export default function privateChatHandler(
   });
 
   socket.on('disconnect', async () => {
-    socket.nsp.to(chatId).emit(
-      SERVER_TO_CLIENT_EVENTS_KEY.NEW_MESSAGE,
-      generateSocketMessage(
-        socket.data.username,
-        MessageType.NOTIFICATION,
-        `${username} покинул чат`,
-        {
-          event: ChatEvents.MATE_LEFT,
-        }
-      )
-    );
+    const usersInChat = socket.nsp.adapter.rooms.get(chatId);
+
+    if (usersInChat?.has(socket.id)) {
+      socket.nsp.to(chatId).emit(
+        SERVER_TO_CLIENT_EVENTS_KEY.NEW_MESSAGE,
+        generateSocketMessage(
+          socket.data.username,
+          MessageType.NOTIFICATION,
+          `${username} покинул чат`,
+          {
+            event: ChatEvents.MATE_LEFT,
+          }
+        )
+      );
+    }
+
+    if (usersInChat) {
+      if (usersInChat.size === 0) {
+        chatRoomData.delete(chatId);
+      }
+
+      if (usersInChat.size === 1) {
+        chatRoomData.set(chatId, {
+          isEncrypted: false,
+          sendedPublicKeys: [],
+        });
+      }
+    }
   });
 
   socket.data.username = username;
@@ -98,7 +143,7 @@ export default function privateChatHandler(
             generateSocketMessage(
               socket.data.username,
               MessageType.NOTIFICATION,
-              'Создаём безопасное соединение...'
+              'Создаём безопасное соединение'
             )
           );
       } else {
@@ -108,7 +153,7 @@ export default function privateChatHandler(
             socket.data.username,
             MessageType.NOTIFICATION,
             'В этой комнате уже общаются два человека',
-            { mate: true }
+            { event: ChatEvents.ALREADY_CONNECTED }
           )
         );
         socket.disconnect();
@@ -127,6 +172,7 @@ export default function privateChatHandler(
           }
         )
       );
+      chatRoomData.set(chatId, { isEncrypted: false, sendedPublicKeys: [] });
     }
   } else {
     socket.disconnect();

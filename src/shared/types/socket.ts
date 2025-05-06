@@ -14,6 +14,7 @@ export const SERVER_TO_CLIENT_EVENTS_KEY = {
   //pm
   RECIEVE_PUBLIC_KEY: 'receive-public-key',
   ENCRYPTED_MESSAGE: 'encrypted-message',
+  ENCRYPTED_CONNECTION_CREATED: 'encrypted-connection-created',
   //public
   NEW_MESSAGE: 'new-message',
 } as const;
@@ -80,4 +81,5 @@ export interface PublicChatSocketData {
 
 export enum ChatEvents {
   MATE_LEFT = 'mate_left',
+  ALREADY_CONNECTED = 'already_connected',
 }
